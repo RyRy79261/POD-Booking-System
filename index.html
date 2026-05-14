@@ -1,272 +1,1146 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Pad Booking System</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pad Booking System</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #111318;
+      color: #e0e0e0;
+    }
 
-body {
-  font-family: Arial;
-  background: #fafafa;
-}
+    /* ---- LOGIN SCREEN ---- */
+    #login-screen {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
 
-#app {
-  display: flex;
-  height: 100vh;
-}
+    .login-card {
+      background: #1a1d24;
+      border-radius: 12px;
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+      border: 1px solid #2a2d35;
+    }
 
-#sidebar {
-  width: 260px;
-  background: #f4f4f4;
-  border-right: 1px solid #ddd;
-  display: flex;
-  flex-direction: column;
-}
+    .login-card h1 {
+      font-size: 24px;
+      margin-bottom: 4px;
+      color: #f0f0f0;
+    }
 
-#sidebar-header {
-  padding: 10px;
-  font-weight: bold;
-  border-bottom: 1px solid #ddd;
-}
+    .login-card .subtitle {
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
 
-#people-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+    .login-card label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #999;
+    }
 
-.person-chip {
-  background: white;
-  border: 1px solid #ddd;
-  padding: 8px;
-  font-size: 13px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 6px;
-}
+    .login-card input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #333;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      background: #22252d;
+      color: #e0e0e0;
+    }
 
-.person-chip button {
-  font-size: 10px;
-  padding: 2px 6px;
-  cursor: pointer;
-}
+    .login-card input:focus {
+      border-color: #5a9e6f;
+    }
 
-#admin-login, #admin-panel {
-  padding: 10px;
-  border-top: 1px solid #ddd;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+    .login-card .btn-primary {
+      width: 100%;
+      margin-top: 16px;
+      padding: 10px;
+      background: #4a7c59;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
 
-#admin-panel { display: none; }
+    .login-card .btn-primary:hover {
+      background: #5a9e6f;
+    }
 
-input, select, button {
-  padding: 6px;
-  font-size: 12px;
-}
+    .login-card .btn-primary:disabled {
+      background: #2d4a36;
+      color: #667;
+      cursor: not-allowed;
+    }
 
-#main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
+    #login-status {
+      margin-top: 12px;
+      font-size: 13px;
+      min-height: 20px;
+    }
 
-#header {
-  padding: 12px;
-  border-bottom: 1px solid #ddd;
-  display: flex;
-  justify-content: space-between;
-}
+    #login-status.success { color: #6fbf85; }
+    #login-status.error { color: #e06060; }
 
-#mode {
-  font-size: 12px;
-  color: #666;
-}
+    .login-card .demo-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: #777;
+      cursor: pointer;
+      text-decoration: underline;
+    }
 
-#site {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
+    .login-card .demo-link:hover {
+      color: #6fbf85;
+    }
 
-.pad {
-  background: white;
-  border: 1px solid #ddd;
-}
+    /* ---- APP LAYOUT ---- */
+    #app {
+      display: none;
+      height: 100vh;
+    }
 
-.pad-header {
-  padding: 8px;
-  background: #eee;
-  font-weight: bold;
-}
+    /* ---- TOP BAR ---- */
+    #topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: #1a2e22;
+      color: #e0e0e0;
+      border-bottom: 1px solid #2a3a30;
+    }
 
-.pad-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-  padding: 8px;
-}
+    #topbar h1 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #6fbf85;
+    }
 
-.tent {
-  border: 1px solid #ccc;
-  padding: 6px;
-  min-height: 70px;
-  font-size: 11px;
-  background: #fafafa;
-  position: relative;
-}
+    #topbar .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
 
-.tent.booked {
-  background: #c9b6ff;
-}
+    #topbar .badge {
+      background: rgba(111,191,133,0.15);
+      color: #6fbf85;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
-.tent.drag-over {
-  border: 2px dashed #000;
-}
+    .btn-logout {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #bbb;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
 
-.tent-title {
-  font-weight: bold;
-  font-size: 10px;
-  margin-bottom: 4px;
-}
+    .btn-logout:hover {
+      background: rgba(255,255,255,0.1);
+      color: #e0e0e0;
+    }
 
-.slot {
-  font-size: 10px;
-  margin-top: 3px;
-}
+    /* ---- CONTENT AREA ---- */
+    #content {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
 
-.remove-btn {
-  position: absolute;
-  right: 6px;
-  top: 6px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  font-size: 12px;
-  opacity: 0.7;
-}
+    /* ---- SIDEBAR ---- */
+    #sidebar {
+      width: 240px;
+      background: #1a1d24;
+      border-right: 1px solid #2a2d35;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
 
-.remove-btn:hover {
-  opacity: 1;
-}
+    #sidebar-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid #2a2d35;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-.export-btn {
-  margin-top: 6px;
-}
-</style>
+    #sidebar-header h3 {
+      font-size: 14px;
+      color: #999;
+    }
+
+    .btn-admin {
+      background: none;
+      border: 1px solid #333;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      color: #888;
+    }
+
+    .btn-admin:hover {
+      border-color: #5a9e6f;
+      color: #6fbf85;
+    }
+
+    #people-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .person-chip {
+      padding: 8px 10px;
+      background: #22252d;
+      border: 1px solid #333;
+      border-radius: 8px;
+      cursor: grab;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      transition: box-shadow 0.15s, border-color 0.15s;
+      user-select: none;
+    }
+
+    .person-chip:hover {
+      border-color: #5a9e6f;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.3);
+    }
+
+    .person-chip:active {
+      cursor: grabbing;
+    }
+
+    .person-chip .chip-name {
+      font-weight: 500;
+      color: #e0e0e0;
+    }
+
+    .person-chip .chip-type {
+      font-size: 11px;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .person-chip.type-single {
+      border-left: 3px solid #e67e22;
+    }
+
+    .person-chip.type-sharing {
+      border-left: 3px solid #5dade2;
+    }
+
+    #people-empty {
+      color: #555;
+      font-size: 12px;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    /* ---- ADMIN PANEL ---- */
+    #admin-panel {
+      display: none;
+      padding: 12px 16px;
+      border-top: 1px solid #2a2d35;
+      background: #161920;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #admin-panel h4 {
+      font-size: 12px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    #admin-panel input,
+    #admin-panel select {
+      padding: 7px 10px;
+      border: 1px solid #333;
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+      background: #22252d;
+      color: #e0e0e0;
+    }
+
+    #admin-panel input:focus,
+    #admin-panel select:focus {
+      border-color: #5a9e6f;
+    }
+
+    .admin-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-add {
+      flex: 1;
+      padding: 7px;
+      background: #4a7c59;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-add:hover { background: #5a9e6f; }
+
+    .btn-clear {
+      padding: 7px 12px;
+      background: #22252d;
+      color: #e06060;
+      border: 1px solid #333;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .btn-clear:hover {
+      border-color: #e06060;
+    }
+
+    /* ---- SITE MAP ---- */
+    #main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #site-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid #2a2d35;
+      background: #1a1d24;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #site-header h2 {
+      font-size: 16px;
+      color: #e0e0e0;
+    }
+
+    .legend {
+      display: flex;
+      gap: 14px;
+      font-size: 11px;
+      color: #888;
+    }
+
+    .legend span::before {
+      content: '';
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+
+    .legend .leg-empty::before { background: #22252d; border: 1px solid #444; }
+    .legend .leg-single::before { background: #3d2a10; border: 1px solid #e67e22; }
+    .legend .leg-sharing::before { background: #142a3d; border: 1px solid #5dade2; }
+
+    #site {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+      align-content: start;
+    }
+
+    /* ---- POD CARD ---- */
+    .pod {
+      background: #1a1d24;
+      border-radius: 10px;
+      border: 1px solid #2a2d35;
+      overflow: hidden;
+    }
+
+    .pod-header {
+      padding: 10px 14px;
+      background: #1a2e22;
+      color: #6fbf85;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pod-count {
+      font-weight: 400;
+      font-size: 11px;
+      opacity: 0.7;
+      color: #999;
+    }
+
+    .pod-tents {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      padding: 10px;
+    }
+
+    /* ---- TENT SLOT ---- */
+    .tent {
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 6px;
+      font-size: 11px;
+      min-height: 56px;
+      background: #22252d;
+      position: relative;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .tent .tent-label {
+      font-weight: 600;
+      color: #666;
+      font-size: 10px;
+      margin-bottom: 2px;
+    }
+
+    .tent .tent-occupant {
+      font-size: 11px;
+      color: #bbb;
+      word-break: break-word;
+    }
+
+    .tent .tent-remove {
+      position: absolute;
+      top: 3px;
+      right: 4px;
+      background: none;
+      border: none;
+      font-size: 13px;
+      cursor: pointer;
+      color: #555;
+      line-height: 1;
+      padding: 0 2px;
+    }
+
+    .tent .tent-remove:hover {
+      color: #e06060;
+    }
+
+    .tent.occupied-single {
+      background: #2a2010;
+      border-color: #8a5a18;
+    }
+
+    .tent.occupied-sharing {
+      background: #10202e;
+      border-color: #2e6b99;
+    }
+
+    .tent.drag-over {
+      border: 2px dashed #5a9e6f;
+      background: #1a2e22;
+    }
+
+    .tent.empty-slot {
+      border-style: dashed;
+      border-color: #333;
+    }
+
+    /* ---- TOAST ---- */
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #2a2d35;
+      color: #e0e0e0;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+      z-index: 100;
+      pointer-events: none;
+      border: 1px solid #3a3d45;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 768px) {
+      #content { flex-direction: column; }
+      #sidebar {
+        width: 100%;
+        max-height: 200px;
+        border-right: none;
+        border-bottom: 1px solid #2a2d35;
+      }
+      #site {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ---- CAT BACKGROUND ANIMATION ---- */
+    #login-screen {
+      position: relative;
+      overflow: hidden;
+    }
+
+    #cat-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .login-card {
+      position: relative;
+      z-index: 1;
+      backdrop-filter: blur(8px);
+      background: rgba(26, 29, 36, 0.85) !important;
+    }
+
+    /* ---- EASTER EGG ---- */
+    .secret-cat {
+      position: fixed;
+      bottom: 8px;
+      right: 12px;
+      font-size: 18px;
+      opacity: 0.08;
+      cursor: default;
+      user-select: none;
+      transition: opacity 0.3s, transform 0.3s;
+      z-index: 9999;
+    }
+    .secret-cat:hover {
+      opacity: 1;
+      transform: scale(1.6);
+    }
+  </style>
 </head>
 
 <body>
 
+<!-- ======== LOGIN ======== -->
+<div id="login-screen">
+  <canvas id="cat-canvas"></canvas>
+  <div class="login-card">
+    <h1>Pad Booking</h1>
+    <p class="subtitle">Sign in to manage your tent assignments</p>
+
+    <label for="email">Email address</label>
+    <input id="email" type="email" placeholder="you@example.com" autocomplete="email" />
+
+    <button class="btn-primary" id="btn-send" onclick="sendLoginLink()">
+      Send login link
+    </button>
+
+    <p id="login-status"></p>
+
+    <span class="demo-link" onclick="enterDemo()">Try demo mode (no login needed)</span>
+  </div>
+</div>
+
+<!-- ======== APP ======== -->
 <div id="app">
 
-<div id="sidebar">
-
-  <div id="sidebar-header">Pad Booking System</div>
-
-  <div id="people-list"></div>
-
-  <div id="admin-login">
-    <input id="admin-pass" type="password" placeholder="Admin password" />
-    <button onclick="unlockAdmin()">Unlock Admin</button>
+  <!-- Top bar -->
+  <div id="topbar">
+    <h1>Pad Booking</h1>
+    <div class="user-info">
+      <span id="user-email"></span>
+      <span class="badge" id="user-role"></span>
+      <button class="btn-logout" onclick="logout()">Log out</button>
+    </div>
   </div>
 
-  <div id="admin-panel">
-    <div style="font-size:12px;font-weight:bold;">Admin Panel</div>
+  <!-- Content -->
+  <div id="content">
 
-    <input id="new-name" placeholder="Name" />
-    <select id="new-type">
-      <option value="sharing">Sharing</option>
-      <option value="single">Single</option>
-    </select>
+    <!-- Sidebar: unassigned people -->
+    <div id="sidebar">
+      <div id="sidebar-header">
+        <h3>Unassigned</h3>
+        <button class="btn-admin" id="btn-toggle-admin" onclick="toggleAdmin()">Admin</button>
+      </div>
 
-    <button onclick="addPerson()">Add Person</button>
-    <button onclick="exportExcel()">Export to Excel</button>
-    <button onclick="lockAdmin()">Lock Admin</button>
+      <div id="people-list"></div>
+
+      <div id="admin-panel">
+        <h4>Add camper</h4>
+        <input id="new-name" placeholder="Name" />
+        <select id="new-type">
+          <option value="sharing">Sharing</option>
+          <option value="single">Single</option>
+        </select>
+        <div class="admin-actions">
+          <button class="btn-add" onclick="addPerson()">Add camper</button>
+          <button class="btn-add" onclick="exportCSV()" style="background:#2e6b99">Export CSV</button>
+          <button class="btn-clear" onclick="clearAll()">Clear all</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main: site map -->
+    <div id="main">
+      <div id="site-header">
+        <h2>Site Map</h2>
+        <div class="legend">
+          <span class="leg-empty">Empty</span>
+          <span class="leg-single">Single</span>
+          <span class="leg-sharing">Sharing</span>
+        </div>
+      </div>
+      <div id="site"></div>
+    </div>
+
   </div>
-
 </div>
 
-<div id="main">
+<!-- Toast -->
+<div id="toast"></div>
 
-  <div id="header">
-    <div>Pads Overview</div>
-    <div id="mode"></div>
-  </div>
+<!-- ======== FIREBASE ======== -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+import {
+  getAuth,
+  sendSignInLinkToEmail,
+  isSignInWithEmailLink,
+  signInWithEmailLink,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-  <div id="site"></div>
+/* ================================================
+   FIREBASE CONFIG
+   ================================================
+   Replace the values below with your own Firebase
+   project config from the Firebase Console:
+   Project Settings > General > Your apps > Config
+   ================================================ */
 
-</div>
-
-</div>
-
-<script>
-
-let isAdmin = false;
-const ADMIN_PASSWORD = "404044";
-let dragId = null;
-
-const PADS = {
-  3: { sharing: 6, single: 4 },
-  4: { sharing: 4, single: 4 },
-  5: { sharing: 4, single: 4 },
-  10:{ sharing: 7, single: 7 }
+const firebaseConfig = {
+  apiKey:            "YOUR_API_KEY",
+  authDomain:        "YOUR_PROJECT.firebaseapp.com",
+  projectId:         "YOUR_PROJECT",
+  storageBucket:     "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId:             "YOUR_APP_ID"
 };
 
-let people = [
-  { id:"p1", name:"Alice", type:"sharing" },
-  { id:"p2", name:"Ben", type:"single" },
-  { id:"p3", name:"Cara", type:"sharing" },
-  { id:"p4", name:"Dan", type:"single" }
-];
+/* ================================================
+   APP URL — set this to your deployed URL
+   e.g. "https://yourname.github.io/pod-booking/"
+   For local dev, use: "http://localhost:8080/"
+   ================================================ */
+const APP_URL = window.location.origin + window.location.pathname;
 
+/* ================================================
+   ADMIN EMAIL — the email that gets admin rights
+   ================================================ */
+const ADMIN_EMAIL = "admin@example.com";
+
+/* ================================================
+   SITE LAYOUT — pods and tents per pod
+   Each pod has sharing tents and single tents.
+   ================================================ */
+const PADS = {
+  3:  { sharing: 6, single: 4 },
+  4:  { sharing: 4, single: 4 },
+  5:  { sharing: 4, single: 4 },
+  10: { sharing: 7, single: 7 }
+};
+
+/* ================================================
+   STATE
+   ================================================ */
+let firebaseApp, auth, db;
+let firebaseEnabled = false;
+let user = null;
+let isAdmin = false;
+let isDemoMode = false;
+let dragId = null;
+
+let people = [];
 let assignments = {};
+let unsubscribeSnapshot = null;
 
-function person(id){
-  return people.find(p => p.id === id);
+/* ================================================
+   INIT
+   ================================================ */
+try {
+  if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+    firebaseApp = initializeApp(firebaseConfig);
+    auth = getAuth(firebaseApp);
+    db = getFirestore(firebaseApp);
+    firebaseEnabled = true;
+  }
+} catch (e) {
+  console.warn("Firebase init skipped:", e.message);
 }
 
-/* ---------------- ADMIN ---------------- */
+/* ================================================
+   AUTH — send magic link
+   ================================================ */
+window.sendLoginLink = async function () {
+  if (!firebaseEnabled) {
+    showStatus("Firebase not configured — use demo mode", "error");
+    return;
+  }
 
-function unlockAdmin(){
-  const pass = document.getElementById("admin-pass").value;
+  const email = document.getElementById("email").value.trim();
+  if (!email) {
+    showStatus("Please enter your email", "error");
+    return;
+  }
 
-  if(pass === ADMIN_PASSWORD){
-    isAdmin = true;
-    document.getElementById("admin-login").style.display = "none";
-    document.getElementById("admin-panel").style.display = "flex";
-    render();
-  } else {
-    alert("Wrong password");
+  const btn = document.getElementById("btn-send");
+  btn.disabled = true;
+  btn.textContent = "Sending…";
+
+  try {
+    await sendSignInLinkToEmail(auth, email, {
+      url: APP_URL,
+      handleCodeInApp: true
+    });
+    localStorage.setItem("emailForSignIn", email);
+    showStatus("Login link sent — check your email", "success");
+  } catch (e) {
+    console.error(e);
+    showStatus("Failed to send link. Check your Firebase config.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Send login link";
+  }
+};
+
+/* ================================================
+   AUTH — complete sign-in from email link
+   ================================================ */
+async function completeEmailLinkSignIn() {
+  if (!firebaseEnabled) return;
+  if (!isSignInWithEmailLink(auth, window.location.href)) return;
+
+  let email = localStorage.getItem("emailForSignIn");
+  if (!email) {
+    email = prompt("Confirm your email to complete sign-in:");
+    if (!email) return;
+  }
+
+  try {
+    const result = await signInWithEmailLink(auth, email, window.location.href);
+    localStorage.removeItem("emailForSignIn");
+    window.history.replaceState({}, document.title, APP_URL);
+  } catch (e) {
+    console.error("Sign-in failed:", e);
+    showStatus("Sign-in failed — try again", "error");
   }
 }
 
-function lockAdmin(){
-  isAdmin = false;
-  document.getElementById("admin-login").style.display = "flex";
-  document.getElementById("admin-panel").style.display = "none";
+completeEmailLinkSignIn();
+
+/* ================================================
+   AUTH — state observer
+   ================================================ */
+if (firebaseEnabled) {
+  onAuthStateChanged(auth, (u) => {
+    if (u) {
+      enterApp(u.email, u.email === ADMIN_EMAIL);
+    }
+  });
+}
+
+/* ================================================
+   DEMO MODE — no Firebase needed
+   ================================================ */
+window.enterDemo = function () {
+  isDemoMode = true;
+  isAdmin = true;
+
+  people = [
+    { id: "p1", name: "Alice",   type: "sharing" },
+    { id: "p2", name: "Ben",     type: "single" },
+    { id: "p3", name: "Charlie", type: "sharing" },
+    { id: "p4", name: "Dana",    type: "single" },
+  ];
+  assignments = {};
+
+  enterApp("demo@example.com", true);
+  toast("Demo mode — you have admin access, data is local only");
+};
+
+/* ================================================
+   ENTER APP
+   ================================================ */
+function enterApp(email, admin) {
+  user = email;
+  isAdmin = admin;
+
+  document.getElementById("login-screen").style.display = "none";
+  document.getElementById("app").style.display = "flex";
+
+  document.getElementById("user-email").textContent = email;
+  document.getElementById("user-role").textContent = admin ? "Admin" : "Camper";
+  document.getElementById("btn-toggle-admin").style.display = admin ? "" : "none";
+
+  if (firebaseEnabled && !isDemoMode) {
+    subscribeToData();
+  }
+
   render();
 }
 
-/* ---------------- PEOPLE ---------------- */
+/* ================================================
+   LOGOUT
+   ================================================ */
+window.logout = async function () {
+  if (unsubscribeSnapshot) {
+    unsubscribeSnapshot();
+    unsubscribeSnapshot = null;
+  }
+  if (firebaseEnabled && auth) {
+    await signOut(auth);
+  }
+  user = null;
+  isAdmin = false;
+  isDemoMode = false;
+  people = [];
+  assignments = {};
 
-function addPerson(){
-  if(!isAdmin) return;
+  document.getElementById("app").style.display = "none";
+  document.getElementById("login-screen").style.display = "flex";
+  if (window._startCatAnimation) window._startCatAnimation();
+};
 
-  const name = document.getElementById("new-name").value.trim();
+/* ================================================
+   FIRESTORE — sync data
+   ================================================ */
+function subscribeToData() {
+  if (!firebaseEnabled || !db) return;
+
+  const ref = doc(db, "sites", "default");
+  unsubscribeSnapshot = onSnapshot(ref, (snap) => {
+    if (snap.exists()) {
+      const data = snap.data();
+      people = data.people || [];
+      assignments = data.assignments || {};
+    } else {
+      people = [];
+      assignments = {};
+    }
+    render();
+  });
+}
+
+async function saveData() {
+  if (!firebaseEnabled || !db || isDemoMode) return;
+
+  try {
+    await setDoc(doc(db, "sites", "default"), {
+      people: people.map(p => ({ id: p.id, name: p.name, type: p.type })),
+      assignments
+    });
+  } catch (e) {
+    console.error("Save failed:", e);
+    toast("Failed to save — check Firestore rules");
+  }
+}
+
+/* ================================================
+   ASSIGN person to tent
+   ================================================ */
+window.assign = function (personId, tentId) {
+  const p = findPerson(personId);
+  if (!p) return;
+
+  const slotType = tentId.split("-")[1];
+  if (p.type !== slotType) {
+    toast(`${p.name} is ${p.type} — can't go in a ${slotType} tent`);
+    return;
+  }
+
+  if (p.type === "single") {
+    if (assignments[tentId]) return;
+    assignments[tentId] = { name: p.name, type: "single", personId: p.id };
+  } else {
+    const current = assignments[tentId];
+    if (current && current.name2) return;
+    if (current && !current.name2) {
+      current.name2 = p.name;
+      current.personId2 = p.id;
+    } else {
+      assignments[tentId] = { name: p.name, type: "sharing", personId: p.id, name2: null, personId2: null };
+    }
+  }
+
+  p._tent = tentId;
+  render();
+  saveData();
+  toast(`${p.name} → ${tentId}`);
+};
+
+/* ================================================
+   REMOVE person from tent
+   ================================================ */
+window.removePerson = function (tentId, personId) {
+  const a = assignments[tentId];
+  if (!a) return;
+
+  if (a.personId === personId) {
+    if (a.name2) {
+      a.name = a.name2;
+      a.personId = a.personId2;
+      a.name2 = null;
+      a.personId2 = null;
+    } else {
+      delete assignments[tentId];
+    }
+  } else if (a.personId2 === personId) {
+    a.name2 = null;
+    a.personId2 = null;
+  }
+
+  const p = findPerson(personId);
+  if (p) delete p._tent;
+
+  render();
+  saveData();
+};
+
+/* ================================================
+   HELPERS
+   ================================================ */
+function findPerson(id) {
+  return people.find(p => p.id === id);
+}
+
+function isAssigned(personId) {
+  for (const tid in assignments) {
+    const a = assignments[tid];
+    if (a.personId === personId || a.personId2 === personId) return true;
+  }
+  return false;
+}
+
+/* ================================================
+   RENDER
+   ================================================ */
+function render() {
+  renderPeople();
+  renderSite();
+}
+
+/* ================================================
+   RENDER — people sidebar
+   ================================================ */
+function renderPeople() {
+  const list = document.getElementById("people-list");
+  list.innerHTML = "";
+
+  const unassigned = people.filter(p => !isAssigned(p.id));
+
+  if (unassigned.length === 0) {
+    list.innerHTML = '<div id="people-empty">All campers assigned</div>';
+    return;
+  }
+
+  unassigned.forEach(p => {
+    const el = document.createElement("div");
+    el.className = `person-chip type-${p.type}`;
+    el.draggable = true;
+    el.innerHTML = `<span class="chip-name">${esc(p.name)}</span><span class="chip-type">${p.type}</span>`;
+
+    el.addEventListener("dragstart", (e) => {
+      dragId = p.id;
+      e.dataTransfer.effectAllowed = "move";
+      el.style.opacity = "0.5";
+    });
+
+    el.addEventListener("dragend", () => {
+      dragId = null;
+      el.style.opacity = "1";
+    });
+
+    list.appendChild(el);
+  });
+}
+
+/* ================================================
+   RENDER — site map
+   ================================================ */
+function renderSite() {
+  const site = document.getElementById("site");
+  site.innerHTML = "";
+
+  for (const padKey of Object.keys(PADS)) {
+    const pad = PADS[padKey];
+    const totalTents = pad.sharing + pad.single;
+    const podEl = document.createElement("div");
+    podEl.className = "pod";
+
+    let filled = 0;
+    for (let i = 1; i <= pad.sharing; i++) {
+      if (assignments[`${padKey}-sharing-${i}`]) filled++;
+    }
+    for (let i = 1; i <= pad.single; i++) {
+      if (assignments[`${padKey}-single-${i}`]) filled++;
+    }
+
+    const header = document.createElement("div");
+    header.className = "pod-header";
+    header.innerHTML = `
+      <span>Pad ${padKey}</span>
+      <span class="pod-count">${filled}/${totalTents} occupied</span>
+    `;
+
+    const grid = document.createElement("div");
+    grid.className = "pod-tents";
+
+    for (let i = 1; i <= pad.sharing; i++) {
+      grid.appendChild(makeTentEl(padKey, "sharing", i));
+    }
+    for (let i = 1; i <= pad.single; i++) {
+      grid.appendChild(makeTentEl(padKey, "single", i));
+    }
+
+    podEl.appendChild(header);
+    podEl.appendChild(grid);
+    site.appendChild(podEl);
+  }
+}
+
+function makeTentEl(padKey, slotType, index) {
+  const tid = `${padKey}-${slotType}-${index}`;
+  const a = assignments[tid];
+  const el = document.createElement("div");
+
+  if (a) {
+    el.className = `tent occupied-${a.type || slotType}`;
+    let occupantHtml = `<span>${esc(a.name)}</span>`;
+    if (a.name2) {
+      occupantHtml += `<br><span>${esc(a.name2)}</span>`;
+    }
+
+    let removeHtml = "";
+    if (isAdmin) {
+      removeHtml = `<button class="tent-remove" onclick="removePerson('${tid}','${a.personId}')" title="Remove">×</button>`;
+    }
+
+    el.innerHTML = `
+      <div class="tent-label">${slotType === "sharing" ? "S" : "T"}${index} - ${slotType}</div>
+      <div class="tent-occupant">${occupantHtml}</div>
+      ${removeHtml}
+    `;
+  } else {
+    el.className = "tent empty-slot";
+    el.innerHTML = `
+      <div class="tent-label">${slotType === "sharing" ? "S" : "T"}${index} - ${slotType}</div>
+      <div class="tent-occupant" style="color:#555">empty</div>
+    `;
+  }
+
+  el.addEventListener("dragover", (e) => {
+    if (!dragId) return;
+    const p = findPerson(dragId);
+    if (p && p.type !== slotType) return;
+    e.preventDefault();
+    el.classList.add("drag-over");
+  });
+
+  el.addEventListener("dragleave", () => {
+    el.classList.remove("drag-over");
+  });
+
+  el.addEventListener("drop", (e) => {
+    e.preventDefault();
+    el.classList.remove("drag-over");
+    if (dragId) {
+      const p = findPerson(dragId);
+      if (p && p.type === slotType) {
+        assign(dragId, tid);
+      }
+      dragId = null;
+    }
+  });
+
+  return el;
+}
+
+/* ================================================
+   ADMIN — toggle panel
+   ================================================ */
+window.toggleAdmin = function () {
+  if (!isAdmin) return;
+  const panel = document.getElementById("admin-panel");
+  panel.style.display = panel.style.display === "flex" ? "none" : "flex";
+};
+
+/* ================================================
+   ADMIN — add person
+   ================================================ */
+window.addPerson = function () {
+  if (!isAdmin) return;
+
+  const nameInput = document.getElementById("new-name");
+  const name = nameInput.value.trim();
+  if (!name) return;
+
   const type = document.getElementById("new-type").value;
-
-  if(!name) return;
 
   people.push({
     id: "p" + Date.now(),
@@ -274,211 +1148,339 @@ function addPerson(){
     type
   });
 
-  document.getElementById("new-name").value = "";
+  nameInput.value = "";
   render();
-}
+  saveData();
+  toast(`Added ${name} (${type})`);
+};
 
-function deletePerson(id){
-  if(!isAdmin) return;
+/* ================================================
+   ADMIN — clear all assignments
+   ================================================ */
+window.clearAll = function () {
+  if (!isAdmin) return;
+  if (!confirm("Clear all tent assignments?")) return;
 
-  for(const k in assignments){
-    if(assignments[k].owner === id){
-      delete assignments[k];
-    }
-  }
-
-  people = people.filter(p => p.id !== id);
+  people.forEach(p => delete p._tent);
+  assignments = {};
   render();
-}
+  saveData();
+  toast("All assignments cleared");
+};
 
-/* ---------------- ASSIGN ---------------- */
-
-function assign(pid, padKey, slotType, index){
-  const p = person(pid);
-  if(!p) return;
-
-  if(p.type !== slotType) return;
-
-  const key = `${padKey}-${slotType}-${index}`;
-  const a = assignments[key] || { slot1:null, slot2:null };
-
-  if(a.slot1) return;
-
-  if(p.type === "sharing"){
-    a.slot1 = p.name;
-    a.slot2 = p.name;
-  } else {
-    a.slot1 = p.name;
-    a.slot2 = "N/A";
-  }
-
-  a.owner = p.id;
-  assignments[key] = a;
-  p._slot = key;
-
-  render();
-}
-
-function remove(owner){
-  for(const k in assignments){
-    if(assignments[k].owner === owner){
-      delete assignments[k];
-    }
-  }
-
-  const p = person(owner);
-  if(p) delete p._slot;
-
-  render();
-}
-
-/* ---------------- EXPORT ---------------- */
-
-function exportExcel(){
-  if(!isAdmin) return;
+/* ================================================
+   ADMIN — export to CSV
+   ================================================ */
+window.exportCSV = function () {
+  if (!isAdmin) return;
 
   let csv = "Pad,Type,Tent,Name\n";
-
-  for(const key in assignments){
+  for (const key in assignments) {
     const a = assignments[key];
     const [pad, type, index] = key.split("-");
-    csv += `${pad},${type},${index},${a.slot1}\n`;
+    csv += `${pad},${type},${index},${esc(a.name)}\n`;
+    if (a.name2) {
+      csv += `${pad},${type},${index},${esc(a.name2)}\n`;
+    }
   }
 
   const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "pad-bookings.csv";
-  a.click();
-
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "pad-bookings.csv";
+  link.click();
   URL.revokeObjectURL(url);
+  toast("CSV exported");
+};
+
+/* ================================================
+   UTILITIES
+   ================================================ */
+function esc(str) {
+  const d = document.createElement("div");
+  d.textContent = str;
+  return d.innerHTML;
 }
 
-/* ---------------- RENDER ---------------- */
-
-function render(){
-  document.getElementById("mode").textContent =
-    isAdmin ? "Admin Mode" : "User Mode";
-
-  renderPeople();
-  renderPads();
+function showStatus(msg, type) {
+  const el = document.getElementById("login-status");
+  el.textContent = msg;
+  el.className = type || "";
 }
 
-/* ---------------- PEOPLE LIST ---------------- */
-
-function renderPeople(){
-  const list = document.getElementById("people-list");
-  list.innerHTML = "";
-
-  people.filter(p => !p._slot).forEach(p => {
-
-    const el = document.createElement("div");
-    el.className = "person-chip";
-    el.draggable = true;
-
-    el.innerHTML = `
-      <span>${p.name} (${p.type})</span>
-      ${isAdmin ? `<button onclick="deletePerson('${p.id}')">X</button>` : ""}
-    `;
-
-    el.ondragstart = () => dragId = p.id;
-
-    list.appendChild(el);
-  });
+function toast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 2800);
 }
+</script>
 
-/* ---------------- PADS ---------------- */
+<div class="secret-cat" title="🐱">🐈‍⬛</div>
 
-function renderPads(){
-  const site = document.getElementById("site");
-  site.innerHTML = "";
+<script>
+(function catAnimation() {
+  const canvas = document.getElementById('cat-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
 
-  Object.keys(PADS).forEach(padKey => {
+  const CATS = ['🐈‍⬛','🐈‍⬛','🐈‍⬛','🐈‍⬛','🐈‍⬛','🐈‍⬛','🐈‍⬛','🐈‍⬛','🐈‍⬛','🐈‍⬛','🐈‍⬛','🐱','🐱','🐈','🐈','😺','😸','😻','🐾','🐾'];
+  const CELL = 36;
+  const ARMS = 4;
+  const ROT_SPEED = 0.0006;
+  const SHUFFLE_PROB_HI = 0.4;
+  const SHUFFLE_PROB_LO = 0.05;
+  const TWO_PI = Math.PI * 2;
+  const HALF_PI = Math.PI;
+  const ARM_STEP = TWO_PI / ARMS;
 
-    const pad = PADS[padKey];
+  let cols, rows, cells, angle = 0;
+  let mouseX = -1, mouseY = -1;
+  let sparkles = [];
+  let ripples = [];
+  let animId = null;
+  let lastTime = 0;
+  let cachedW = 0, cachedH = 0, cachedMaxR = 0;
 
-    const padEl = document.createElement("div");
-    padEl.className = "pad";
-    padEl.innerHTML = `<div class="pad-header">Pad ${padKey}</div>`;
+  const spriteCache = new Map();
+  const SPRITE_SIZE = 20;
+  const SPARKLE_SIZES = [14, 18, 22, 26, 30];
+  function getSprite(char, size) {
+    const key = char + '|' + size;
+    let s = spriteCache.get(key);
+    if (s) return s;
+    const off = document.createElement('canvas');
+    off.width = size * 2;
+    off.height = size * 2;
+    const oc = off.getContext('2d');
+    oc.textAlign = 'center';
+    oc.textBaseline = 'middle';
+    oc.font = size + 'px serif';
+    oc.fillText(char, size, size);
+    spriteCache.set(key, off);
+    return off;
+  }
 
-    const grid = document.createElement("div");
-    grid.className = "pad-grid";
+  function prebakeSprites() {
+    const unique = [...new Set(CATS)];
+    for (const ch of unique) {
+      getSprite(ch, SPRITE_SIZE);
+      for (const sz of SPARKLE_SIZES) getSprite(ch, sz);
+    }
+  }
 
-    for(let i=1;i<=pad.sharing;i++){
-      const key = `${padKey}-sharing-${i}`;
-      const a = assignments[key];
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    cachedW = canvas.clientWidth;
+    cachedH = canvas.clientHeight;
+    canvas.width = cachedW * dpr;
+    canvas.height = cachedH * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cachedMaxR = Math.max(cachedW, cachedH) * 0.45;
+    cols = Math.ceil(cachedW / CELL) + 1;
+    rows = Math.ceil(cachedH / CELL) + 1;
+    initCells();
+  }
 
-      const el = document.createElement("div");
-      el.className = "tent " + (a ? "booked" : "");
+  function initCells() {
+    cells = [];
+    const now = performance.now();
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        cells.push({
+          x: c * CELL + CELL / 2,
+          y: r * CELL + CELL / 2,
+          charIdx: Math.floor(Math.random() * CATS.length),
+          opacity: 0,
+          targetOpacity: 0,
+          fadeDelay: Math.random() * 600,
+          fadeStart: now - 1000,
+          lastShuffle: 0
+        });
+      }
+    }
+  }
 
-      el.innerHTML = `
-        <button class="remove-btn" onclick="remove('${a?.owner || ""}')">×</button>
-        <div class="tent-title">Tent ${i} - Sharing</div>
-        <div class="slot">${a?.slot1 || "empty"}</div>
-      `;
-
-      el.ondragover = e => {
-        const p = person(dragId);
-        if(!p || p.type !== "sharing") return;
-        e.preventDefault();
-        el.classList.add("drag-over");
-      };
-
-      el.ondragleave = () => el.classList.remove("drag-over");
-
-      el.ondrop = e => {
-        e.preventDefault();
-        el.classList.remove("drag-over");
-        const p = person(dragId);
-        if(!p || p.type !== "sharing") return;
-        assign(dragId, padKey, "sharing", i);
-      };
-
-      grid.appendChild(el);
+  function frame(now) {
+    const loginEl = document.getElementById('login-screen');
+    if (!loginEl || loginEl.style.display === 'none') {
+      animId = null;
+      return;
     }
 
-    for(let i=1;i<=pad.single;i++){
-      const key = `${padKey}-single-${i}`;
-      const a = assignments[key];
+    if (now - lastTime < 16) {
+      animId = requestAnimationFrame(frame);
+      return;
+    }
+    lastTime = now;
 
-      const el = document.createElement("div");
-      el.className = "tent " + (a ? "booked" : "");
+    const w = cachedW;
+    const h = cachedH;
+    const maxR = cachedMaxR;
+    const maxRSq = maxR * maxR;
+    angle += ROT_SPEED;
 
-      el.innerHTML = `
-        <button class="remove-btn" onclick="remove('${a?.owner || ""}')">×</button>
-        <div class="tent-title">Tent ${i} - Single</div>
-        <div class="slot">${a?.slot1 || "empty"}</div>
-      `;
+    const cx = mouseX >= 0 ? mouseX * 0.92 + w * 0.04 : w * 0.5;
+    const cy = mouseY >= 0 ? mouseY * 0.92 + h * 0.04 : h * 0.5;
 
-      el.ondragover = e => {
-        const p = person(dragId);
-        if(!p || p.type !== "single") return;
-        e.preventDefault();
-        el.classList.add("drag-over");
-      };
+    ctx.clearRect(0, 0, w, h);
 
-      el.ondragleave = () => el.classList.remove("drag-over");
+    const hasRipples = ripples.length > 0;
+    const halfSprite = SPRITE_SIZE;
 
-      el.ondrop = e => {
-        e.preventDefault();
-        el.classList.remove("drag-over");
-        const p = person(dragId);
-        if(!p || p.type !== "single") return;
-        assign(dragId, padKey, "single", i);
-      };
+    for (let ci = 0, len = cells.length; ci < len; ci++) {
+      const cell = cells[ci];
+      const dx = cell.x - cx;
+      const dy = cell.y - cy;
+      const distSq = dx * dx + dy * dy;
 
-      grid.appendChild(el);
+      let intensity = 0;
+      if (distSq < maxRSq) {
+        const dist = Math.sqrt(distSq);
+        const theta = Math.atan2(dy, dx);
+        const invMaxR = 1 / maxR;
+        const normDist = dist * invMaxR;
+
+        let best = 0;
+        for (let arm = 0; arm < ARMS; arm++) {
+          const spiralAngle = angle + arm * ARM_STEP + dist * 0.012;
+          let diff = (theta - spiralAngle) % TWO_PI;
+          if (diff < 0) diff += TWO_PI;
+          if (diff > HALF_PI) diff = TWO_PI - diff;
+
+          const width = 0.35 + 0.25 * (1 - normDist);
+          if (diff < width) {
+            const armIntensity = 1 - diff / width;
+            const distFade = 1 - normDist * 0.6;
+            const val = armIntensity * distFade;
+            if (val > best) best = val;
+          }
+        }
+
+        const coreNorm = dist / (maxR * 0.08);
+        if (coreNorm < 1) {
+          const coreGlow = (1 - coreNorm) * 0.6;
+          const pulse = 0.5 + 0.5 * Math.sin(angle * 4);
+          const coreVal = coreGlow * pulse;
+          if (coreVal > best) best = coreVal;
+        }
+
+        intensity = best > 1 ? 1 : best;
+      }
+
+      if (hasRipples) {
+        for (let ri = 0; ri < ripples.length; ri++) {
+          const rip = ripples[ri];
+          const ripProgress = (now - rip.start) / rip.duration;
+          if (ripProgress >= 1) continue;
+          const rdx = cell.x - rip.x;
+          const rdy = cell.y - rip.y;
+          const rd = Math.sqrt(rdx * rdx + rdy * rdy);
+          const ripRadius = ripProgress * rip.maxRadius;
+          const ripDist = rd - ripRadius;
+          const absRipDist = ripDist < 0 ? -ripDist : ripDist;
+          if (absRipDist < 60) {
+            intensity += (1 - absRipDist / 60) * (1 - ripProgress) * 0.7;
+          }
+        }
+        if (intensity > 1) intensity = 1;
+      }
+
+      cell.targetOpacity = intensity;
+
+      if (now - cell.fadeStart > cell.fadeDelay) {
+        cell.opacity += (cell.targetOpacity - cell.opacity) * 0.04;
+      }
+
+      if (cell.opacity < 0.02) continue;
+
+      const prob = intensity > 0.4 ? SHUFFLE_PROB_HI : SHUFFLE_PROB_LO;
+      if (now - cell.lastShuffle > 150 && Math.random() < prob) {
+        cell.charIdx = Math.floor(Math.random() * CATS.length);
+        cell.lastShuffle = now;
+      }
+
+      ctx.globalAlpha = cell.opacity;
+      const sprite = getSprite(CATS[cell.charIdx], SPRITE_SIZE);
+      ctx.drawImage(sprite, cell.x - halfSprite, cell.y - halfSprite);
     }
 
-    padEl.appendChild(grid);
-    site.appendChild(padEl);
+    for (let i = sparkles.length - 1; i >= 0; i--) {
+      const s = sparkles[i];
+      const age = now - s.start;
+      if (age > s.life) {
+        sparkles[i] = sparkles[sparkles.length - 1];
+        sparkles.pop();
+        continue;
+      }
+      const progress = age / s.life;
+      const sparkAlpha = progress < 0.15
+        ? progress / 0.15
+        : 1 - (progress - 0.15) / 0.85;
+      const twinkle = 0.7 + 0.3 * Math.sin(age * s.twinkleSpeed);
+      ctx.globalAlpha = sparkAlpha * twinkle * 0.95;
+      const spr = getSprite(s.char, s.size);
+      ctx.drawImage(spr, s.x + Math.sin(age * 0.002 + s.drift) * 8 - s.size, s.y - age * 0.015 - s.size);
+    }
+
+    ctx.globalAlpha = 1;
+
+    if (sparkles.length < 40 && Math.random() < 0.18) {
+      const sz = SPARKLE_SIZES[Math.floor(Math.random() * SPARKLE_SIZES.length)];
+      sparkles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        char: CATS[Math.floor(Math.random() * CATS.length)],
+        start: now,
+        life: 1200 + Math.random() * 2000,
+        size: sz,
+        twinkleSpeed: 0.005 + Math.random() * 0.01,
+        drift: Math.random() * TWO_PI
+      });
+    }
+
+    if (hasRipples) {
+      ripples = ripples.filter(r => now - r.start < r.duration);
+    }
+
+    animId = requestAnimationFrame(frame);
+  }
+
+  canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    mouseX = e.clientX - rect.left;
+    mouseY = e.clientY - rect.top;
   });
-}
 
-render();
+  canvas.addEventListener('mouseleave', () => {
+    mouseX = -1;
+    mouseY = -1;
+  });
 
+  canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    ripples.push({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+      start: performance.now(),
+      duration: 2000,
+      maxRadius: Math.max(cachedW, cachedH) * 0.4
+    });
+  });
+
+  window.addEventListener('resize', resize);
+  prebakeSprites();
+  resize();
+  animId = requestAnimationFrame(frame);
+
+  window._startCatAnimation = function () {
+    if (!animId) {
+      resize();
+      animId = requestAnimationFrame(frame);
+    }
+  };
+})();
 </script>
 
 </body>
