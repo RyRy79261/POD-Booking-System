@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pad Booking System</title>
+  <title>Pod Booking System</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -121,31 +121,29 @@
       height: 100vh;
     }
 
-    /* ---- TOP BAR ---- */
-    #topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 20px;
-      background: #1a2e22;
-      color: #e0e0e0;
-      border-bottom: 1px solid #2a3a30;
+    /* ---- SIDEBAR FOOTER (user info) ---- */
+    #sidebar-footer {
+      padding: 12px 16px;
+      border-top: 1px solid #2a2d35;
+      margin-top: auto;
     }
 
-    #topbar h1 {
-      font-size: 16px;
+    #sidebar-footer h1 {
+      font-size: 14px;
       font-weight: 600;
       color: #6fbf85;
+      margin: 0 0 8px 0;
     }
 
-    #topbar .user-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 13px;
+    #sidebar-footer span {
+      display: block;
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 4px;
     }
 
-    #topbar .badge {
+    #sidebar-footer .badge {
+      display: inline-block;
       background: rgba(111,191,133,0.15);
       color: #6fbf85;
       padding: 2px 8px;
@@ -153,6 +151,7 @@
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      margin-bottom: 8px;
     }
 
     .btn-logout {
@@ -163,6 +162,7 @@
       border-radius: 6px;
       font-size: 12px;
       cursor: pointer;
+      width: 100%;
     }
 
     .btn-logout:hover {
@@ -572,8 +572,8 @@
 <div id="login-screen">
   <canvas id="cat-canvas"></canvas>
   <div class="login-card">
-    <h1>Pad Booking</h1>
-    <p class="subtitle">Sign in to manage your tent assignments</p>
+    <h1>Pod Booking</h1>
+    <p class="subtitle">Sign in to manage your pod assignments</p>
 
     <label for="email">Email address</label>
     <input id="email" type="email" placeholder="you@example.com" autocomplete="email" />
@@ -590,16 +590,6 @@
 
 <!-- ======== APP ======== -->
 <div id="app">
-
-  <!-- Top bar -->
-  <div id="topbar">
-    <h1>Pad Booking</h1>
-    <div class="user-info">
-      <span id="user-email"></span>
-      <span class="badge" id="user-role"></span>
-      <button class="btn-logout" onclick="logout()">Log out</button>
-    </div>
-  </div>
 
   <!-- Content -->
   <div id="content">
@@ -625,6 +615,14 @@
           <button class="btn-add" onclick="exportCSV()" style="background:#2e6b99">Export CSV</button>
           <button class="btn-clear" onclick="clearAll()">Clear all</button>
         </div>
+      </div>
+
+      <!-- User info (was topbar) -->
+      <div id="sidebar-footer">
+        <h1>Pod Booking</h1>
+        <span id="user-email"></span>
+        <span class="badge" id="user-role"></span>
+        <button class="btn-logout" onclick="logout()">Log out</button>
       </div>
     </div>
 
@@ -1044,7 +1042,7 @@ function renderSite() {
     const header = document.createElement("div");
     header.className = "pod-header";
     header.innerHTML = `
-      <span>Pad ${padKey}</span>
+      <span>Pod ${padKey}</span>
       <span class="pod-count">${filled}/${totalTents} occupied</span>
     `;
 
@@ -1174,7 +1172,7 @@ window.clearAll = function () {
 window.exportCSV = function () {
   if (!isAdmin) return;
 
-  let csv = "Pad,Type,Tent,Name\n";
+  let csv = "Pod,Type,Tent,Name\n";
   for (const key in assignments) {
     const a = assignments[key];
     const [pad, type, index] = key.split("-");
@@ -1188,7 +1186,7 @@ window.exportCSV = function () {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = "pad-bookings.csv";
+  link.download = "pod-bookings.csv";
   link.click();
   URL.revokeObjectURL(url);
   toast("CSV exported");
