@@ -11,6 +11,8 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: #111318;
       color: #e0e0e0;
+      height: 100vh;
+      overflow: hidden;
     }
 
     /* ---- LOGIN SCREEN ---- */
@@ -345,7 +347,15 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      overflow-y: auto;
+    }
+
+    #hero-image {
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      display: block;
+      border-bottom: 1px solid #2a2d35;
     }
 
     #site-header {
@@ -628,6 +638,7 @@
 
     <!-- Main: site map -->
     <div id="main">
+      <img id="hero-image" src="https://i.ibb.co/YsbpFqq/image.jpg" alt="Site banner" />
       <div id="site-header">
         <h2>Site Map</h2>
         <div class="legend">
